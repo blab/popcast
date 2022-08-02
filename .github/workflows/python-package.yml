@@ -35,4 +35,4 @@ jobs:
         flake8 . --count --show-source --statistics
     - name: Test with cram
       run: |
-        cram tests/
+        cram --shell=/bin/bash tests/
