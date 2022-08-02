@@ -29,7 +29,7 @@ dependencies = [
 test = [
     "coverage[toml] >=5.2.1, ==5.*",
     "cram >=0.7, ==0.*",
-    "deepdiff[cli] >=4.3.2, ==4.*",
+    "deepdiff[cli] >=5.2.0, ==5.*",
     "flake8 >=3.9.0, ==3.*",
     "pylint >=2.14.5, ==2.*",
 ]
