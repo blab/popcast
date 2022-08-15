@@ -1001,6 +1001,7 @@ def get_coefficients_by_timepoint(scores):
 
 def register_arguments(parser):
     parser.add_argument("--tip-attributes", required=True, help="tab-delimited file describing tip attributes at all timepoints with standardized predictors")
+    parser.add_argument("--target-tip-attributes", help="truth set to use for distance comparisons for each timepoint in the corresponding tip attributes input. Use this to compare a lagged input data set to a known final data set for the same timepoints.")
     parser.add_argument("--output", required=True, help="JSON representing the model fit with training and cross-validation results, beta coefficients for predictors, and summary statistics")
     parser.add_argument("--predictors", nargs="+", help="tip attribute columns to use as predictors of final clade frequencies; optional if a fixed model is provided")
     parser.add_argument("--delta-months", type=int, default=12, help="number of months to project clade frequencies into the future")
@@ -1078,12 +1079,26 @@ def run(args):
         # not considered closer to the future.
         tips["y"] = tips["weighted_distance_to_future"]
 
-        # Get strain frequency per timepoint and subtract delta time from
-        # timepoint to align strain frequencies with the previous timepoint and
-        # make them appropriate as targets for the model.
-        targets = tips.loc[:, ["strain", "timepoint", "frequency", "weighted_distance_to_present", "weighted_distance_to_future", "y", args.sequence_attribute]].copy()
-        targets["future_timepoint"] = targets["timepoint"]
+        # Load truth-set targets provided by the user, if provided.
+        if args.target_tip_attributes:
+            targets = pd.read_csv(
+                args.target_tip_attributes,
+                sep="\t",
+                parse_dates=["timepoint"],
+                usecols=(
+                    "strain",
+                    "timepoint",
+                    "frequency",
+                    "weighted_distance_to_present",
+                    "weighted_distance_to_future",
+                    args.sequence_attribute
+                ),
+            )
+            targets["y"] = targets["weighted_distance_to_future"]
+        else:
+            targets = tips.loc[:, ["strain", "timepoint", "frequency", "weighted_distance_to_present", "weighted_distance_to_future", "y", args.sequence_attribute]].copy()
 
+        targets["future_timepoint"] = targets["timepoint"]
         model_class = DistanceExponentialGrowthModel
         model_kwargs = {"sequence_attribute": args.sequence_attribute}
         group_by_attribute = "strain"
