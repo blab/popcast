@@ -1,4 +1,4 @@
-# nextcast: Long-term forecasts for pathogen populations
+# popcast: Long-term forecasts for pathogen populations
 
 ## Install
 
@@ -8,7 +8,7 @@ Install [Flit](https://flit.pypa.io/en/latest/index.html).
 python3 -m pip install flit
 ```
 
-Install nextcast with the current environment's Python 3.
+Install popcast with the current environment's Python 3.
 
 ``` bash
 flit install --python `which python3`
@@ -25,7 +25,7 @@ curl "https://github.com/blab/flu-forecasting/raw/master/results/builds/natural/
 Fit a model using default 6 year training windows and 12-month forecasts.
 
 ``` bash
-nextcast fit \
+popcast fit \
   --tip-attributes tip_attributes_with_weighted_distances.tsv \
   --output lbi_model.json \
   --predictors lbi

@@ -1,10 +1,10 @@
-Functional tests for nextcast model fitting.
+Functional tests for popcast model fitting.
 
   $ pushd "$TESTDIR" > /dev/null
 
 Test a model to with a subset of simulated data.
 
-  $ nextcast fit \
+  $ popcast fit \
   >   --tip-attributes data/simulated_sample_1/tip_attributes.tsv.gz \
   >   --fixed-model "data/simulated_sample_1/normalized_fitness.json" \
   >   --output "$TMP/normalized_fitness.json" > /dev/null

@@ -3,7 +3,7 @@ requires = ["flit_core>=3.2"]
 build-backend = "flit_core.buildapi"
 
 [project]
-name = "nextcast"
+name = "popcast"
 version = "1.0.0"
 authors = [
   { name="John Huddleston", email="huddlej@gmail.com" },
@@ -35,11 +35,11 @@ test = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/huddlej/nextcast"
-"Bug Tracker" = "https://github.com/huddlej/nextcast/issues"
+"Homepage" = "https://github.com/blab/popcast"
+"Bug Tracker" = "https://github.com/blab/popcast/issues"
 
 [project.scripts]
-nextcast = "nextcast.cli:main"
+popcast = "popcast.cli:main"
 
 [tool.coverage.run]
 branch = true

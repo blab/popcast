@@ -1,4 +1,4 @@
-"""Top-level package for nextcast."""
+"""Top-level package for popcast."""
 
 __author__ = """John Huddleston"""
 __email__ = 'huddlej@gmail.com'

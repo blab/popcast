@@ -1,4 +1,4 @@
-"""Console script for nextcast."""
+"""Console script for popcast."""
 import argparse
 import sys
 
@@ -6,7 +6,7 @@ from . import fit, forecast
 
 
 def main():
-    """Console script for nextcast."""
+    """Console script for popcast."""
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
