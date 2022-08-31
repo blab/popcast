@@ -1005,6 +1005,7 @@ def register_arguments(parser):
     parser.add_argument("--output", required=True, help="JSON representing the model fit with training and cross-validation results, beta coefficients for predictors, and summary statistics")
     parser.add_argument("--predictors", nargs="+", help="tip attribute columns to use as predictors of final clade frequencies; optional if a fixed model is provided")
     parser.add_argument("--delta-months", type=int, default=12, help="number of months to project clade frequencies into the future")
+    parser.add_argument("--prefer-user-delta-months", action="store_true", help="prefer the user-provided delta months argument for model fitting over the given fixed model JSON's delta months.")
     parser.add_argument("--target", default="distances", choices=["clades", "distances"], help="target for models to fit")
     parser.add_argument("--final-clade-frequencies", help="tab-delimited file of clades per timepoint and their corresponding tips and tip frequencies at the given delta time in the future")
     parser.add_argument("--training-window", type=int, default=6, help="number of years required for model training")
@@ -1074,11 +1075,6 @@ def run(args):
         model_kwargs = {}
         group_by_attribute = "clade_membership"
     elif args.target == "distances":
-        # Scale each tip's weighted distance to future populations by one minus
-        # the tip's current frequency. This ensures that lower frequency tips do
-        # not considered closer to the future.
-        tips["y"] = tips["weighted_distance_to_future"]
-
         # Load truth-set targets provided by the user, if provided.
         if args.target_tip_attributes:
             targets = pd.read_csv(
@@ -1089,14 +1085,11 @@ def run(args):
                     "strain",
                     "timepoint",
                     "frequency",
-                    "weighted_distance_to_present",
-                    "weighted_distance_to_future",
                     args.sequence_attribute
                 ),
             )
-            targets["y"] = targets["weighted_distance_to_future"]
         else:
-            targets = tips.loc[:, ["strain", "timepoint", "frequency", "weighted_distance_to_present", "weighted_distance_to_future", "y", args.sequence_attribute]].copy()
+            targets = tips.loc[:, ["strain", "timepoint", "frequency", args.sequence_attribute]].copy()
 
         targets["future_timepoint"] = targets["timepoint"]
         model_class = DistanceExponentialGrowthModel
@@ -1114,7 +1107,12 @@ def run(args):
             model_json = json.load(fh)
 
         coefficients = np.array(model_json["coefficients_mean"])
-        delta_months = model_json["delta_months"]
+
+        if args.prefer_user_delta_months:
+            delta_months = args.delta_months
+        else:
+            delta_months = model_json["delta_months"]
+
         delta_time = delta_months / 12.0
         l1_lambda = model_json["l1_lambda"]
         training_window = model_json["training_window"]
