@@ -35,8 +35,8 @@ test = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/huddlej/popcast"
-"Bug Tracker" = "https://github.com/huddlej/popcast/issues"
+"Homepage" = "https://github.com/blab/popcast"
+"Bug Tracker" = "https://github.com/blab/popcast/issues"
 
 [project.scripts]
 popcast = "popcast.cli:main"
