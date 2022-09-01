@@ -30,3 +30,23 @@ popcast fit \
   --output lbi_model.json \
   --predictors lbi
 ```
+
+## Publish
+
+Install or upgrade publishing tools.
+
+``` bash
+python3 -m pip install --upgrade build twine
+```
+
+Build the distribution packages.
+
+``` bash
+python3 -m build
+```
+
+Upload the distribution packages.
+
+``` bash
+python3 -m twine upload dist/*
+```
