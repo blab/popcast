@@ -2,16 +2,8 @@
 
 ## Install
 
-Install [Flit](https://flit.pypa.io/en/latest/index.html).
-
 ``` bash
-python3 -m pip install flit
-```
-
-Install popcast with the current environment's Python 3.
-
-``` bash
-flit install --python `which python3`
+python3 -m pip install popcast
 ```
 
 ## Usage
@@ -31,7 +23,29 @@ popcast fit \
   --predictors lbi
 ```
 
-## Publish
+## Development
+
+### Install locally
+
+``` bash
+python3 -m pip install .[test]
+```
+
+### Lint and run tests
+
+Lint code.
+
+``` bash
+flake8 . --count --show-source --statistics
+```
+
+Run tests.
+
+``` bash
+cram --shell=/bin/bash tests/
+```
+
+### Publish
 
 Install or upgrade publishing tools.
 
