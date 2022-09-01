@@ -1,5 +1,7 @@
 # popcast: Long-term forecasts for pathogen populations
 
+See the methods of [Huddleston et al. 2020](https://doi.org/10.7554/eLife.60067) for more details or to cite this tool.
+
 ## Install
 
 ``` bash
