@@ -13,4 +13,13 @@ Forecast frequencies with a model trained on simulated data.
   {}
   $ rm -f "$TMP/forecasts.tsv"
 
+Forecast tips with existing frequencies.
+
+  $ popcast forecast \
+  >   --tip-attributes data/simulated_sample_1/2040-10-01/tip_attributes.tsv.gz \
+  >   --frequencies data/simulated_sample_1/2040-10-01/frequencies.json \
+  >   --model data/simulated_sample_1/normalized_fitness.json \
+  >   --delta-months 12 \
+  >   --output-table "$TMP/forecasts.tsv"
+
   $ popd > /dev/null
