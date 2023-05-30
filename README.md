@@ -30,7 +30,7 @@ popcast fit \
 ### Install locally
 
 ``` bash
-python3 -m pip install .[test]
+python3 -m pip install ".[test]"
 ```
 
 ### Lint and run tests
