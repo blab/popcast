@@ -1,22 +1,77 @@
 """Fit a model for the given data using the requested predictors and evaluate the model by time series cross-validation.
 """
-import cv2
 import json
 import numpy as np
 import pandas as pd
+import pyemd
 from scipy.optimize import minimize
 import sys
 import time
 
-from .utils import get_train_validate_timepoints, hamming_distance
-from .metrics import add_pseudocounts_to_frequencies, negative_information_gain
-from .metrics import mean_absolute_error, sum_of_squared_errors, root_mean_square_error
-from .weighted_distances import get_distance_matrix_by_sample_names
+from popcast.utils import get_train_validate_timepoints, hamming_distance
+from popcast.metrics import add_pseudocounts_to_frequencies, negative_information_gain
+from popcast.metrics import mean_absolute_error, sum_of_squared_errors, root_mean_square_error
+from popcast.weighted_distances import get_distance_matrix_by_sample_names
 
 MAX_PROJECTED_FREQUENCY = 1e3
 FREQUENCY_TOLERANCE = 1e-3
 
 np.random.seed(314159)
+
+
+def pad_arrays(a, b, d):
+    """Pad the given arrays and distance matrix such that both arrays have equal
+    lengths and the distance matrix is square.
+
+    Arguments
+    ---------
+    a, b : numpy.array
+        1d arrays that could be different lengths
+
+    d: numpy.array
+        2d matrix that could be non-square
+
+    Returns
+    -------
+    numpy.array, numpy.array, numpy.array :
+        arrays where the shortest array has been padded to match the length of
+        the longest and same with the distance matrix.
+
+    >>> a = np.array([0.25, 0.25, 0.5])
+    >>> b = np.array([0.1, 0.9])
+    >>> d = np.array([[0.0, 0.5], [0.5, 0.0], [0.1, 0.1]])
+    >>> pad_arrays(a, b, d)
+    (array([0.25, 0.25, 0.5 ]), array([0.1, 0.9, 0. ]), array([[0. , 0.5, 0. ],
+           [0.5, 0. , 0. ],
+           [0.1, 0.1, 0. ]]))
+
+    The order of the arrays should be maintained, such that the first array
+    returned has the content of the first array passed to the function.
+
+    >>> d = d.T
+    >>> pad_arrays(b, a, d)
+    (array([0.1, 0.9, 0. ]), array([0.25, 0.25, 0.5 ]), array([[0. , 0.5, 0.1],
+           [0.5, 0. , 0.1],
+           [0. , 0. , 0. ]]))
+
+    """
+    if a.size == b.size:
+        return a, b, d
+
+    if a.size > b.size:
+        new_a = a
+        new_b = np.zeros(a.size)
+        new_b[:b.size] = b
+    else:
+        new_a = np.zeros(b.size)
+        new_a[:a.size] = a
+        new_b = b
+
+    max_size = max(a.size, b.size)
+    new_d = np.zeros((max_size, max_size))
+    new_d[:a.size, :b.size] = d
+
+    return new_a, new_b, new_d
 
 
 def sum_of_differences(observed, estimated, y_diff, **kwargs):
@@ -427,20 +482,20 @@ class DistanceExponentialGrowthModel(ExponentialGrowthModel):
         count = 0
         for timepoint, timepoint_df in y_hat.groupby("timepoint"):
             samples_a = timepoint_df["strain"]
-            sample_a_frequencies = timepoint_df["projected_frequency"].values.astype(np.float32)
+            sample_a_frequencies = timepoint_df["projected_frequency"].values.astype(np.float64)
 
             future_timepoint_df = y[y["timepoint"] == timepoint]
             assert future_timepoint_df.shape[0] > 0
 
             samples_b = future_timepoint_df["strain"]
-            sample_b_frequencies = future_timepoint_df["frequency"].values.astype(np.float32)
+            sample_b_frequencies = future_timepoint_df["frequency"].values.astype(np.float64)
 
             distance_matrix = get_distance_matrix_by_sample_names(
                 samples_a,
                 samples_b,
                 timepoint_df[self.sequence_attribute].values,
                 future_timepoint_df[self.sequence_attribute].values
-            ).astype(np.float32)
+            ).astype(np.float64)
 
             # Calculate the optimal distance to the future timepoint by mapping
             # the frequency of each future strain to the closest strain in the
@@ -464,20 +519,28 @@ class DistanceExponentialGrowthModel(ExponentialGrowthModel):
                 # timepoints. The resulting EMD value should be the best any
                 # model can hope to perform and establishes a lower bound for
                 # all models.
-                self.optimal_model_emd, _, optimal_model_flow = cv2.EMD(
+                new_estimated_frequencies, new_sample_b_frequencies, new_distance_matrix = pad_arrays(
                     estimated_frequencies,
                     sample_b_frequencies,
-                    cv2.DIST_USER,
-                    cost=distance_matrix
+                    distance_matrix,
+                )
+                self.optimal_model_emd, optimal_model_flow = pyemd.emd_with_flow(
+                    new_estimated_frequencies,
+                    new_sample_b_frequencies,
+                    new_distance_matrix,
                 )
 
             # Estimate the distance between the model's estimated future and the
             # observed future populations.
-            model_emd, _, self.model_flow = cv2.EMD(
+            new_sample_a_frequencies, new_sample_b_frequencies, new_distance_matrix = pad_arrays(
                 sample_a_frequencies,
                 sample_b_frequencies,
-                cv2.DIST_USER,
-                cost=distance_matrix
+                distance_matrix,
+            )
+            model_emd, self.model_flow = pyemd.emd_with_flow(
+                new_sample_a_frequencies,
+                new_sample_b_frequencies,
+                new_distance_matrix,
             )
 
             error += model_emd
