@@ -21,6 +21,7 @@ classifiers = [
 dependencies = [
     "jellyfish >=0.8.2, ==0.*",
     "opencv-python >=4.5, ==4.*",
+    "numpy >=1.17.0, ==1.*",
     "pandas >=1.2.0, ==1.*",
     "scipy >=1.5.4, ==1.*",
 ]
@@ -29,7 +30,6 @@ dependencies = [
 test = [
     "coverage[toml] >=5.2.1, ==5.*",
     "cram >=0.7, ==0.*",
-    "deepdiff[cli] >=5.2.0, ==5.*",
     "flake8 >=3.9.0, ==3.*",
     "pylint >=2.14.5, ==2.*",
 ]
