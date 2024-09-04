@@ -20,6 +20,7 @@ if __name__ == "__main__":
         args.first_tsv,
         sep="\t",
         header=None,
+        engine="python",
         na_filter=False,
     ).to_dict()
 
@@ -27,6 +28,7 @@ if __name__ == "__main__":
         args.second_tsv,
         sep="\t",
         header=None,
+        engine="python",
         na_filter=False,
     ).to_dict()
 
