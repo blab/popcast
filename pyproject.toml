@@ -20,13 +20,15 @@ classifiers = [
 
 dependencies = [
     "jellyfish >=0.8.2, ==0.*",
-    "opencv-python >=4.5, ==4.*",
     "numpy >=1.17.0, ==1.*",
     "pandas >=1.2.0, ==1.*",
     "scipy >=1.5.4, ==1.*",
 ]
 
 [project.optional-dependencies]
+full = [
+    "opencv-python >=4.5, ==4.*",
+]
 test = [
     "coverage[toml] >=5.2.1, ==5.*",
     "cram >=0.7, ==0.*",

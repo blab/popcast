@@ -4,8 +4,16 @@ See the methods of [Huddleston et al. 2020](https://doi.org/10.7554/eLife.60067)
 
 ## Install
 
+For a full installation with the OpenCV package that's required for model fitting, specify the "full" package dependencies.
+
 ``` bash
-python3 -m pip install popcast
+python -m pip install 'popcast[full]'
+```
+
+For a smaller installation that only supports forecasting with an existing model, omit the optional package dependency.
+
+``` bash
+python -m pip install popcast
 ```
 
 ## Usage
@@ -30,7 +38,7 @@ popcast fit \
 ### Install locally
 
 ``` bash
-python3 -m pip install ".[test]"
+python -m pip install '.[full,test]'
 ```
 
 ### Lint and run tests
@@ -52,17 +60,17 @@ cram --shell=/bin/bash tests/
 Install or upgrade publishing tools.
 
 ``` bash
-python3 -m pip install --upgrade build twine
+python -m pip install --upgrade build twine
 ```
 
 Build the distribution packages.
 
 ``` bash
-python3 -m build
+python -m build
 ```
 
 Upload the distribution packages.
 
 ``` bash
-python3 -m twine upload dist/*
+python -m twine upload dist/*
 ```
