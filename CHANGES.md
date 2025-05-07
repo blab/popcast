@@ -1,5 +1,11 @@
 # Change log
 
+## 2.0.0
+
+### Major changes
+
+- Make [OpenCV](https://pypi.org/project/opencv-python/) an optional dependency, simplifying installation requirements for forecasting from an existing model. This change requires users to specify the "full" package version at installation to get support for model fitting. [#4](https://github.com/blab/popcast/pull/4) (@huddlej)
+
 ## 1.1.0
 
 ### Features
