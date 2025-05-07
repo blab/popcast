@@ -1,6 +1,5 @@
 """Fit a model for the given data using the requested predictors and evaluate the model by time series cross-validation.
 """
-import cv2
 import json
 import numpy as np
 import pandas as pd
@@ -418,6 +417,12 @@ class DistanceExponentialGrowthModel(ExponentialGrowthModel):
             error between estimated values using the given coefficients and
             input data and the observed values
         """
+        try:
+            import cv2
+        except ImportError:
+            print("Failed to import cv2 package required for model fitting. Install popcast with OpenCV using \"python -m pip install 'popcast[full]'\".", file=sys.stderr)
+            sys.exit(1)
+
         # Estimate target values.
         y_hat = self.predict(X, coefficients)
 
